@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartRoom")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba838a30d02b01e00ce4ee165b36b334cede4b3d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartRoom")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartRoom")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

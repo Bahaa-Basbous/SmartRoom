@@ -7,19 +7,23 @@ namespace SmartRoom.Entities
     public class Booking
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string BookingId { get; set; } = string.Empty;
-        public string RoomId { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
+        public int BookingId { get; set; }
+
+        public int RoomId { get; set; }
+        public int UserId { get; set; }
+
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string Status { get; set; } = "Pending"; // Default status is Pending
+
+        public string Status { get; set; } = "Pending";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        [ForeignKey("User")]
 
-        public virtual User User { get; set; } = null!;
+        [ForeignKey("UserId")]
+        public User User { get; set; } = null!;
 
-        // Navigation properties can be added if using an ORM like Entity Framework
-        // public virtual Room Room { get; set; }
-        // public virtual User User { get; set; }
+        [ForeignKey("RoomId")]
+        public Room Room { get; set; } = null!;
+
+        //public Meeting? Meeting { get; set; }  // 1:1 with Meeting
     }
 }

@@ -9,7 +9,7 @@ namespace SmartRoom.Entities
     public class User
     {
         [Key]
-        public int Id { get; set; } // ✅ EF will automatically treat this as PK
+        public int Id { get; set; } 
 
         public string Name { get; set; }
         public string Email { get; set; }
