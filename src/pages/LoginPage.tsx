@@ -15,8 +15,10 @@ export default function LoginPage() {
         password,
       });
 
-      localStorage.setItem("token", response.data.token); // Save JWT token
-      //alert("Login successful!");
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role);     // ✅ used for Dashboard
+      localStorage.setItem("name", response.data.name);     // optional
+      localStorage.setItem("userId", response.data.id);     // optional
       navigate("/dashboard");
     } catch (error) {
       alert("Login failed. Please check your credentials.");
