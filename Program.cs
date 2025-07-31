@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using SmartRoom.Data;
 using SmartRoom.Entities;
 using SmartRoom.Helpers;
@@ -9,9 +11,9 @@ using SmartRoom.Repositories;
 using SmartRoom.Services;
 using SmartRoom.Services.Auth;
 using System.Text;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 
 
 
@@ -74,6 +76,15 @@ builder.Services.AddScoped<IMoMRepository, MoMRepository>();
 builder.Services.AddScoped<IMoMService, MoMService>();
 builder.Services.AddScoped<IActionItemRepository, ActionItemRepository>();
 builder.Services.AddScoped<IActionItemService, ActionItemService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
+
+
 
 
 builder.Services.AddSingleton<TokenGenerator>();
@@ -99,6 +110,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost5173", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Your frontend URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 
 
@@ -110,6 +130,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowLocalhost5173");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

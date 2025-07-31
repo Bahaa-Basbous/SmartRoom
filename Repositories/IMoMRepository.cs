@@ -9,5 +9,7 @@ namespace SmartRoom.Repositories
         Task CreateAsync(MoM mom);
         Task UpdateAsync(MoM mom);
         Task DeleteAsync(int id);
+        Task<MoM?> GetByIdWithDetailsAsync(int id);
+
     }
 }

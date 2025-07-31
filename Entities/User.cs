@@ -16,5 +16,8 @@ namespace SmartRoom.Entities
         public string PasswordHash { get; set; }
         public string Role { get; set; }
         public string ProfileDetails { get; set; }
+        public string? ResetToken { get; set; }
+        public DateTime? ResetTokenExpiry { get; set; }
+
     }
 }

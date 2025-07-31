@@ -14,22 +14,36 @@ namespace SmartRoom.Repositories
         }
 
         public async Task<IEnumerable<MoM>> GetAllAsync()
-            => await _context.MoMs
-                .Include(m => m.Meeting)
-                .Include(m => m.ActionItems)
-                .ToListAsync();
+    => await _context.MoMs
+        .Include(m => m.Meeting)
+        .Include(m => m.CreatedBy)
+        .Include(m => m.ActionItems)
+            .ThenInclude(ai => ai.AssignedTo)
+        .ToListAsync();
 
         public async Task<MoM?> GetByIdAsync(int id)
             => await _context.MoMs
                 .Include(m => m.Meeting)
+                .Include(m => m.CreatedBy)
                 .Include(m => m.ActionItems)
+                    .ThenInclude(ai => ai.AssignedTo)
                 .FirstOrDefaultAsync(m => m.MoMID == id);
+
 
         public async Task CreateAsync(MoM mom)
         {
+            var existingMoM = await _context.MoMs
+                .FirstOrDefaultAsync(m => m.MeetingID == mom.MeetingID);
+
+            if (existingMoM != null)
+            {
+                throw new InvalidOperationException("A MoM for this meeting already exists.");
+            }
+
             await _context.MoMs.AddAsync(mom);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task UpdateAsync(MoM mom)
         {
@@ -46,5 +60,16 @@ namespace SmartRoom.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<MoM?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _context.MoMs
+                .Include(m => m.Meeting)
+                .Include(m => m.CreatedBy)
+                .Include(m => m.ActionItems)
+                    .ThenInclude(ai => ai.AssignedTo)
+                .FirstOrDefaultAsync(m => m.MoMID == id);
+        }
+
+
     }
 }

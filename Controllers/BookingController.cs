@@ -65,7 +65,6 @@ namespace SmartRoom.Controllers
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
             var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-            // Optionally enforce: employee can only create for themselves
             if (currentUserRole != "Admin" && dto.UserId != currentUserId)
                 return Forbid();
 
@@ -79,9 +78,22 @@ namespace SmartRoom.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _service.CreateAsync(booking);
-            return CreatedAtAction(nameof(GetById), new { id = booking.BookingId }, booking);
+            try
+            {
+                await _service.CreateAsync(booking);
+                return CreatedAtAction(nameof(GetById), new { id = booking.BookingId }, booking);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // ⛔️ This returns a 400 BadRequest with your custom message
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
         }
+
 
         // ✅ Only Admins can update
         [HttpPut("{id}")]
@@ -103,5 +115,73 @@ namespace SmartRoom.Controllers
             await _service.DeleteAsync(id);
             return NoContent();
         }
+
+
+
+        // Get pending bookings - Admin only
+        [HttpGet("pending")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<IEnumerable<Booking>>> GetPendingBookings()
+        {
+            var pendingBookings = await _service.GetPendingBookingsAsync();
+            return Ok(pendingBookings);
+        }
+
+        // Update booking status - Admin only
+        [HttpPut("{id}/status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UpdateStatus(int id, [FromBody] UpdateBookingStatusDto dto)
+        {
+            try
+            {
+                await _service.UpdateBookingStatusAsync(id, dto.Status);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Booking not found." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpGet("pending/count")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<int>> GetPendingCount()
+        {
+            var bookings = await _service.GetAllAsync();
+            var pendingCount = bookings.Count(b => b.Status == "Pending");
+            return Ok(pendingCount);
+        }
+        // Example: Get only approved bookings
+        // GET: api/Booking/approved
+        [HttpGet("approved")]
+        [Authorize(Roles = "Admin,Employee")]
+        public async Task<ActionResult<IEnumerable<Booking>>> GetApprovedBookings()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            IEnumerable<Booking> bookings = await _service.GetAllAsync();
+
+            var approvedBookings = bookings.Where(b => b.Status == "Approved");
+
+            if (currentUserRole != "Admin")
+            {
+                approvedBookings = approvedBookings.Where(b => b.UserId == currentUserId);
+            }
+
+            return Ok(approvedBookings);
+        }
+
+
+
+
+
+
+
     }
 }

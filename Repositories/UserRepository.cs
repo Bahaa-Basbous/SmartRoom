@@ -13,6 +13,17 @@ namespace SmartRoom.Repositories
         {
             _context = context;
         }
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User?> GetByResetTokenAsync(string token)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u =>
+                u.ResetToken == token && u.ResetTokenExpiry > DateTime.UtcNow);
+        }
+
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {

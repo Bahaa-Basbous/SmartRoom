@@ -16,13 +16,13 @@ namespace SmartRoom.Repositories
         public async Task<IEnumerable<ActionItem>> GetAllAsync()
             => await _context.ActionItems
                              .Include(a => a.MoM)
-                             .Include(a => a.AssignedUser)
+                             .Include(a => a.AssignedTo)
                              .ToListAsync();
 
         public async Task<ActionItem?> GetByIdAsync(int id)
             => await _context.ActionItems
                              .Include(a => a.MoM)
-                             .Include(a => a.AssignedUser)
+                             .Include(a => a.AssignedTo)
                              .FirstOrDefaultAsync(a => a.ActionItemID == id);
 
         public async Task CreateAsync(ActionItem item)

@@ -40,5 +40,9 @@ namespace SmartRoom.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Meeting?> GetByBookingIdAsync(int bookingId)
+        {
+            return await _context.Meetings.FirstOrDefaultAsync(m => m.BookingId == bookingId);
+        }
     }
 }

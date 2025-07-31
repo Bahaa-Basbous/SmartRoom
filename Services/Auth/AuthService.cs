@@ -47,7 +47,7 @@ namespace SmartRoom.Services.Auth
             if (result == PasswordVerificationResult.Failed) return null;
 
             var token = _tokenGenerator.GenerateToken(user);
-            return new LoginResponse { Token = token, Role = user.Role, Name = user.Name };
+            return new LoginResponse { Token = token, Role = user.Role, Name = user.Name, Id = user.Id };
         }
     }
 }

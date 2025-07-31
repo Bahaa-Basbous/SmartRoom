@@ -36,5 +36,13 @@ namespace SmartRoom.Services
         {
             await _repository.DeleteAsync(id);
         }
+
+
+        public async Task<Meeting?> GetByBookingIdAsync(int bookingId)
+        {
+            return await _repository.GetByBookingIdAsync(bookingId);
+        }
+
+
     }
 }

@@ -9,5 +9,7 @@ namespace SmartRoom.Services
         Task CreateAsync(MoM mom);
         Task UpdateAsync(MoM mom);
         Task DeleteAsync(int id);
+        Task<MoMDto> GetDtoByIdAsync(int id);
+
     }
 }

@@ -24,6 +24,6 @@ namespace SmartRoom.Entities
         [ForeignKey("RoomId")]
         public Room Room { get; set; } = null!;
 
-        //public Meeting? Meeting { get; set; }  // 1:1 with Meeting
+        public Meeting? Meeting { get; set; }  // 1:1 with Meeting
     }
 }

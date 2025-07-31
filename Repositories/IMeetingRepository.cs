@@ -9,5 +9,6 @@ namespace SmartRoom.Repositories
         Task CreateAsync(Meeting meeting);
         Task UpdateAsync(Meeting meeting);
         Task DeleteAsync(int id);
+        Task<Meeting?> GetByBookingIdAsync(int bookingId);
     }
 }

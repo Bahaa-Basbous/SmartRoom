@@ -50,5 +50,25 @@ namespace SmartRoom.Services
         {
             await _repository.DeleteAsync(id);
         }
+        public async Task<List<Booking>> GetPendingBookingsAsync()
+        {
+            var allBookings = await _repository.GetAllAsync();
+            return allBookings.Where(b => b.Status == "Pending").ToList();
+        }
+
+        public async Task UpdateBookingStatusAsync(int bookingId, string status)
+        {
+            var booking = await _repository.GetByIdAsync(bookingId);
+            if (booking == null)
+                throw new KeyNotFoundException("Booking not found.");
+
+            // Optional: Validate status values here (e.g., only "Approved" or "Rejected")
+            if (status != "Approved" && status != "Rejected")
+                throw new ArgumentException("Invalid status value.");
+
+            booking.Status = status;
+            await _repository.UpdateAsync(booking);
+        }
+
     }
 }

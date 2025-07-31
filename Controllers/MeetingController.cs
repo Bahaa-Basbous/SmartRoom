@@ -11,15 +11,17 @@ namespace SmartRoom.Controllers
     public class MeetingController : ControllerBase
     {
         private readonly IMeetingService _service;
+        private readonly IBookingService _bookingService;
 
-        public MeetingController(IMeetingService service)
+        public MeetingController(IMeetingService service, IBookingService bookingService)
         {
             _service = service;
+            _bookingService = bookingService;
         }
 
         // ✅ Accessible to authenticated users (Employee/Admin)
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<ActionResult<IEnumerable<Meeting>>> GetAll()
         {
             return Ok(await _service.GetAllAsync());
@@ -27,7 +29,7 @@ namespace SmartRoom.Controllers
 
         // ✅ Accessible to authenticated users
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Employee,Admin")]
         public async Task<ActionResult<Meeting>> GetById(int id)
         {
             var meeting = await _service.GetByIdAsync(id);
@@ -42,18 +44,31 @@ namespace SmartRoom.Controllers
         [Authorize(Roles = "Employee,Admin")]
         public async Task<ActionResult> Create([FromBody] CreateMeetingDto dto)
         {
+            var booking = await _bookingService.GetByIdAsync(dto.BookingID);
+            if (booking == null)
+                return NotFound(new { message = "Booking not found." });
+
+            if (booking.Status != "Approved")
+                return BadRequest(new { message = "Cannot create meeting from a booking that is not approved." });
+
+            // Check if Meeting already exists for this booking
+            var existingMeeting = await _service.GetByBookingIdAsync(dto.BookingID);
+            if (existingMeeting != null)
+                return BadRequest(new { message = "A meeting for this booking already exists." });
+
             var meeting = new Meeting
             {
                 Title = dto.Title,
                 Agenda = dto.Agenda,
-                BookingID = dto.BookingID,
-                OrganizerID = dto.OrganizerID,
+                BookingId = dto.BookingID,
+                OrganizerId = dto.OrganizerID,
                 DateTime = dto.DateTime
             };
 
             await _service.CreateAsync(meeting);
             return CreatedAtAction(nameof(GetById), new { id = meeting.MeetingID }, meeting);
         }
+
 
         // ✅ Only Admins can update meetings
         [HttpPut("{id}")]
@@ -66,7 +81,7 @@ namespace SmartRoom.Controllers
             await _service.UpdateAsync(meeting);
             return NoContent();
         }
-        
+
         // ✅ Only Admins can delete meetings
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
