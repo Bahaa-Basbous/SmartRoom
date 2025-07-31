@@ -18,7 +18,10 @@ export default function LoginPage() {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("role", response.data.role);     // ✅ used for Dashboard
       localStorage.setItem("name", response.data.name);     // optional
-      localStorage.setItem("userId", response.data.id);     // optional
+      localStorage.setItem("userId", response.data.id); 
+      localStorage.setItem("email", email); // used in ChangePassword
+      
+      // optional
       navigate("/dashboard");
     } catch (error) {
       alert("Login failed. Please check your credentials.");

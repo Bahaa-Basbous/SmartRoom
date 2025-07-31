@@ -27,7 +27,17 @@ export default function RecentMoMs() {
           ))}
         </ul>
       )}
+              <div className="text-right mt-4">
+          <a
+            href="/mom/view"
+            className="text-sm text-purple-700 hover:underline"
+          >
+            View all ➜
+          </a>
+        </div>
+
     </div>
+    
   );
 }
 
